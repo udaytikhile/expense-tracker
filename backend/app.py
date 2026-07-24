@@ -11,7 +11,11 @@ from routes.recurring import recurring_bp
 from routes.export import export_bp
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, origins=[
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "https://expense-tracker-9rc6.onrender.com",  # update with your Netlify URL once deployed
+])
 
 # Initialize database schema and migrations
 init_db()
