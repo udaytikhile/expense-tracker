@@ -14,7 +14,7 @@ app = Flask(__name__)
 CORS(app, origins=[
     "http://localhost:5173",
     "http://127.0.0.1:5173",
-    "https://expense-tracker-9rc6.onrender.com",  # update with your Netlify URL once deployed
+    "https://expense-tracker-projectcom.netlify.app",
 ])
 
 # Initialize database schema and migrations
