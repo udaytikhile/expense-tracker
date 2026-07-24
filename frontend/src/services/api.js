@@ -1,4 +1,4 @@
-const API_BASE = 'http://127.0.0.1:5000/api';
+const API_BASE = (import.meta.env.VITE_API_URL || 'http://127.0.0.1:5000') + '/api';
 
 const getUserId = () => {
   const user = JSON.parse(localStorage.getItem('user') || '{}');
@@ -41,8 +41,12 @@ export const updateProfile = (name, currency) =>
   });
 
 // ── Expenses ──────────────────────────────────────────────────────
-export const fetchExpenses = (start, end, category, search) =>
-  fetch(buildUrl('/expenses', { start, end, category: category !== 'All' ? category : undefined, search })).then(r => r.json());
+export const fetchExpenses = async (start, end, category, search) => {
+  try {
+    const r = await fetch(buildUrl('/expenses', { start, end, category: category !== 'All' ? category : undefined, search }));
+    return await r.json();
+  } catch { return []; }
+};
 
 export const addExpense = (data) =>
   fetch(`${API_BASE}/expenses`, {
@@ -62,79 +66,151 @@ export const deleteExpense = (id) =>
   fetch(`${API_BASE}/expenses/${id}?user_id=${getUserId()}`, { method: 'DELETE' }).then(r => r.json());
 
 // ── Summary ───────────────────────────────────────────────────────
-export const fetchSummary = (start, end) =>
-  fetch(buildUrl('/summary', { start, end })).then(r => r.json());
+export const fetchSummary = async (start, end) => {
+  try {
+    const r = await fetch(buildUrl('/summary', { start, end }));
+    return await r.json();
+  } catch { return { total_income: 0, total_expense: 0, active_budgets_count: 0 }; }
+};
 
-export const fetchMonthly = () =>
-  fetch(buildUrl('/monthly')).then(r => r.json());
+export const fetchMonthly = async () => {
+  try {
+    const r = await fetch(buildUrl('/monthly'));
+    return await r.json();
+  } catch { return []; }
+};
 
-export const fetchDaily = (days = 30) =>
-  fetch(buildUrl('/daily', { days })).then(r => r.json());
+export const fetchDaily = async (days = 30) => {
+  try {
+    const r = await fetch(buildUrl('/daily', { days }));
+    return await r.json();
+  } catch { return []; }
+};
 
 // ── Budgets ───────────────────────────────────────────────────────
-export const fetchBudgets = (month) =>
-  fetch(buildUrl('/budgets', { month })).then(r => r.json());
+export const fetchBudgets = async (month) => {
+  try {
+    const r = await fetch(buildUrl('/budgets', { month }));
+    return await r.json();
+  } catch { return []; }
+};
 
-export const saveBudget = (data) =>
-  fetch(`${API_BASE}/budgets`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ ...data, user_id: getUserId() })
-  }).then(r => r.json());
+export const saveBudget = async (data) => {
+  try {
+    const r = await fetch(`${API_BASE}/budgets`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ...data, user_id: getUserId() })
+    });
+    return await r.json();
+  } catch { return { error: 'Network error' }; }
+};
 
-export const deleteBudget = (id) =>
-  fetch(`${API_BASE}/budgets/${id}?user_id=${getUserId()}`, { method: 'DELETE' }).then(r => r.json());
+export const deleteBudget = async (id) => {
+  try {
+    const r = await fetch(`${API_BASE}/budgets/${id}?user_id=${getUserId()}`, { method: 'DELETE' });
+    return await r.json();
+  } catch { return {}; }
+};
 
 // ── Income ────────────────────────────────────────────────────────
-export const fetchIncome = (start, end) =>
-  fetch(buildUrl('/income', { start, end })).then(r => r.json());
+export const fetchIncome = async (start, end) => {
+  try {
+    const r = await fetch(buildUrl('/income', { start, end }));
+    return await r.json();
+  } catch { return []; }
+};
 
-export const addIncome = (data) =>
-  fetch(`${API_BASE}/income`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ ...data, user_id: getUserId() })
-  }).then(r => r.json());
+export const addIncome = async (data) => {
+  try {
+    const r = await fetch(`${API_BASE}/income`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ...data, user_id: getUserId() })
+    });
+    return await r.json();
+  } catch { return { error: 'Network error' }; }
+};
 
-export const deleteIncome = (id) =>
-  fetch(`${API_BASE}/income/${id}?user_id=${getUserId()}`, { method: 'DELETE' }).then(r => r.json());
+export const deleteIncome = async (id) => {
+  try {
+    const r = await fetch(`${API_BASE}/income/${id}?user_id=${getUserId()}`, { method: 'DELETE' });
+    return await r.json();
+  } catch { return {}; }
+};
 
-export const fetchIncomeSummary = (start, end) =>
-  fetch(buildUrl('/income/summary', { start, end })).then(r => r.json());
+export const fetchIncomeSummary = async (start, end) => {
+  try {
+    const r = await fetch(buildUrl('/income/summary', { start, end }));
+    return await r.json();
+  } catch { return { total_income: 0, total_expense: 0, net_savings: 0 }; }
+};
 
 // ── Recurring ─────────────────────────────────────────────────────
-export const fetchRecurring = () =>
-  fetch(buildUrl('/recurring')).then(r => r.json());
+export const fetchRecurring = async () => {
+  try {
+    const r = await fetch(buildUrl('/recurring'));
+    return await r.json();
+  } catch { return []; }
+};
 
-export const addRecurring = (data) =>
-  fetch(`${API_BASE}/recurring`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ ...data, user_id: getUserId() })
-  }).then(r => r.json());
+export const addRecurring = async (data) => {
+  try {
+    const r = await fetch(`${API_BASE}/recurring`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ...data, user_id: getUserId() })
+    });
+    return await r.json();
+  } catch { return { error: 'Network error' }; }
+};
 
-export const deleteRecurring = (id) =>
-  fetch(`${API_BASE}/recurring/${id}?user_id=${getUserId()}`, { method: 'DELETE' }).then(r => r.json());
+export const deleteRecurring = async (id) => {
+  try {
+    const r = await fetch(`${API_BASE}/recurring/${id}?user_id=${getUserId()}`, { method: 'DELETE' });
+    return await r.json();
+  } catch { return {}; }
+};
 
-export const toggleRecurring = (id) =>
-  fetch(`${API_BASE}/recurring/${id}/toggle?user_id=${getUserId()}`, { method: 'PUT' }).then(r => r.json());
+export const toggleRecurring = async (id) => {
+  try {
+    const r = await fetch(`${API_BASE}/recurring/${id}/toggle?user_id=${getUserId()}`, { method: 'PUT' });
+    return await r.json();
+  } catch { return {}; }
+};
 
-export const processRecurring = () =>
-  fetch(`${API_BASE}/recurring/process`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ user_id: getUserId() })
-  }).then(r => r.json());
+export const processRecurring = async () => {
+  try {
+    const r = await fetch(`${API_BASE}/recurring/process`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ user_id: getUserId() })
+    });
+    return await r.json();
+  } catch { return { message: 'Network error' }; }
+};
 
 // ── Notifications ─────────────────────────────────────────────────
-export const fetchNotifications = () =>
-  fetch(buildUrl('/notifications')).then(r => r.json());
+export const fetchNotifications = async () => {
+  try {
+    const r = await fetch(buildUrl('/notifications'));
+    return await r.json();
+  } catch { return []; }
+};
 
-export const markNotificationRead = (id) =>
-  fetch(`${API_BASE}/notifications/${id}/read`, { method: 'PUT' }).then(r => r.json());
+export const markNotificationRead = async (id) => {
+  try {
+    const r = await fetch(`${API_BASE}/notifications/${id}/read`, { method: 'PUT' });
+    return await r.json();
+  } catch { return {}; }
+};
 
-export const clearNotifications = () =>
-  fetch(`${API_BASE}/notifications/clear?user_id=${getUserId()}`, { method: 'DELETE' }).then(r => r.json());
+export const clearNotifications = async () => {
+  try {
+    const r = await fetch(`${API_BASE}/notifications/clear?user_id=${getUserId()}`, { method: 'DELETE' });
+    return await r.json();
+  } catch { return {}; }
+};
 
 // ── Export ─────────────────────────────────────────────────────────
 export const exportCSV = async (start, end) => {

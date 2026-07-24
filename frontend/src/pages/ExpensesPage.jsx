@@ -127,8 +127,9 @@ export default function ExpensesPage() {
           <>
             <div className="mobile-card-list">
               {currentItems.map(exp => {
-                const categoryEmoji = exp.category.split(' ')[0] || '📦';
-                const categoryName = exp.category.replace(/^[^\s]+\s*/, '');
+                const categoryStr = exp.category || '📦 Unknown';
+                const categoryEmoji = categoryStr.split(' ')[0] || '📦';
+                const categoryName = categoryStr.replace(/^[^\s]+\s*/, '') || 'Unknown';
                 return (
                   <div key={exp.id} className="mobile-transaction-card">
                     <div className="card-left">

@@ -17,7 +17,7 @@ export default function ExportPage() {
     setLoading(true);
     try {
       const data = await fetchExpenses(startDate || undefined, endDate || undefined);
-      setPreview(data.slice(0, 10));
+      setPreview((data || []).slice(0, 10));
       addToast(`Loaded ${Math.min(data.length, 10)} preview rows`, 'info');
     } catch (err) {
       addToast('Failed to fetch preview data', 'error');

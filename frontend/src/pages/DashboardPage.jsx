@@ -34,14 +34,15 @@ export default function DashboardPage() {
         balance: (sumData.total_income || 0) - (sumData.total_expense || 0),
         active_budgets_count: sumData.active_budgets_count || 0
       });
-      setRecentExpenses((expData || []).slice(0, 5));
+      const safeExpData = Array.isArray(expData) ? expData : [];
+      setRecentExpenses(safeExpData.slice(0, 5));
 
       // Generate simple mock/processed chart data for the last few days
-      if (expData && expData.length > 0) {
+      if (safeExpData.length > 0) {
         const dailyMap = {};
-        expData.forEach(exp => {
-          const dateLabel = new Date(exp.date).toLocaleDateString(undefined, { day: 'numeric', month: 'short' });
-          dailyMap[dateLabel] = (dailyMap[dateLabel] || 0) + exp.amount;
+        safeExpData.forEach(exp => {
+          const dateLabel = new Date(exp.date || new Date()).toLocaleDateString(undefined, { day: 'numeric', month: 'short' });
+          dailyMap[dateLabel] = (dailyMap[dateLabel] || 0) + (exp.amount || 0);
         });
         const chartList = Object.entries(dailyMap).map(([name, amount]) => ({ name, amount })).reverse().slice(-7);
         setChartData(chartList);
@@ -204,8 +205,9 @@ export default function DashboardPage() {
             </div>
           ) : (
             recentExpenses.map(exp => {
-              const categoryEmoji = exp.category.split(' ')[0] || '📦';
-              const categoryName = exp.category.replace(/^[^\s]+\s*/, '');
+              const categoryStr = exp.category || '📦 Unknown';
+              const categoryEmoji = categoryStr.split(' ')[0] || '📦';
+              const categoryName = categoryStr.replace(/^[^\s]+\s*/, '') || 'Unknown';
               return (
                 <div key={exp.id} className="mobile-transaction-card">
                   <div className="card-left">
