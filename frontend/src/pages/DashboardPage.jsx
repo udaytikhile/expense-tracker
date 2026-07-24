@@ -8,7 +8,7 @@ import AnimatedCounter from '../components/ui/AnimatedCounter';
 import PageHeader from '../components/layout/PageHeader';
 import { 
   ArrowUpRight, ArrowDownRight, TrendingUp, Wallet, Plus, 
-  Receipt, Landmark, ChevronRight, Trash2, Edit2, Calendar
+  Receipt, Landmark, ChevronRight, Trash2, Edit2, Calendar, Sparkles
 } from 'lucide-react';
 import { AreaChart, Area, ResponsiveContainer, XAxis, YAxis, Tooltip } from 'recharts';
 
@@ -97,14 +97,22 @@ export default function DashboardPage() {
       <PageHeader title="Overview" />
 
       {/* Greeting card */}
-      <div className="dashboard-greeting">
-        <h2>{getGreeting()}, {user?.name || 'User'}!</h2>
-        <p>Here's your financial status for this month</p>
+      <div className="dashboard-greeting stagger-1">
+        <div className="greeting-text">
+          <h2>{getGreeting()}, {user?.name || 'User'}!</h2>
+          <p>Here's your financial summary for this month</p>
+        </div>
       </div>
 
       {/* Main Balance Card */}
-      <div className="balance-hero-card">
-        <span className="balance-card-label">Total Balance</span>
+      <div className="balance-hero-card stagger-1">
+        <div className="balance-card-header">
+          <span className="balance-card-label">Total Balance</span>
+          <span className="balance-status-badge">
+            <Sparkles size={12} /> Active
+          </span>
+        </div>
+
         <h2 className="balance-card-amount">
           <AnimatedCounter value={summary.balance} prefix={userCurrency === 'INR' ? '₹' : '$'} />
         </h2>
@@ -133,7 +141,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Quick Action Hub */}
-      <div className="quick-actions-section">
+      <div className="quick-actions-section stagger-2">
         <h3 className="section-title">Quick Actions</h3>
         <div className="quick-actions-grid">
           <button className="action-hub-btn" onClick={() => navigate('/expenses/add')}>
@@ -165,7 +173,7 @@ export default function DashboardPage() {
 
       {/* Mini Chart Section */}
       {chartData.length > 0 && (
-        <div className="dashboard-chart-card">
+        <div className="dashboard-chart-card stagger-3">
           <h3 className="section-title">Spending Trend</h3>
           <div style={{ width: '100%', height: 160 }}>
             <ResponsiveContainer>
@@ -190,7 +198,7 @@ export default function DashboardPage() {
       )}
 
       {/* Recent Transactions Card List */}
-      <div className="recent-transactions-section">
+      <div className="recent-transactions-section stagger-4">
         <div className="section-header-row">
           <h3 className="section-title">Recent Expenses</h3>
           <button className="view-all-link-btn" onClick={() => navigate('/expenses')}>

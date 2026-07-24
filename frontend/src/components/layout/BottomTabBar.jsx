@@ -34,14 +34,14 @@ export default function BottomTabBar() {
             onClick={() => navigate(tab.path)}
             id={`tab-${tab.label.toLowerCase()}`}
           >
-            <div className="tab-icon-wrap">
-              <Icon size={22} strokeWidth={active ? 2.5 : 1.8} />
-              {active && <div className="tab-active-dot" />}
+            <div className="tab-pill-wrap">
+              <Icon size={20} strokeWidth={active ? 2.5 : 1.8} className="tab-icon" />
+              {active && <span className="tab-label-active">{tab.label}</span>}
             </div>
-            <span className="tab-label">{tab.label}</span>
           </button>
         );
       })}
     </nav>
   );
 }
+

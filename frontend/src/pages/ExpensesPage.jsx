@@ -110,19 +110,40 @@ export default function ExpensesPage() {
         </button>
       </form>
 
+      {/* Category Quick Filter Chips */}
+      <div className="category-chips-scroll">
+        <button
+          className={`filter-chip ${category === 'All' ? 'active' : ''}`}
+          onClick={() => setCategory('All')}
+        >
+          ✨ All
+        </button>
+        {CATEGORIES.slice(0, 6).map(cat => {
+          const catVal = `${cat.emoji} ${cat.label}`;
+          const isSelected = category === catVal;
+          return (
+            <button
+              key={cat.label}
+              className={`filter-chip ${isSelected ? 'active' : ''}`}
+              onClick={() => setCategory(isSelected ? 'All' : catVal)}
+            >
+              {cat.emoji} {cat.label}
+            </button>
+          );
+        })}
+      </div>
+
       {/* Total Expenses Summary Banner */}
       {!loading && expenses.length > 0 && (
-        <div className="income-hero-card" style={{ marginBottom: 12, padding: '16px 20px', background: 'linear-gradient(135deg, rgba(249,115,22,0.15) 0%, rgba(234,88,12,0.05) 100%)', border: '1px solid rgba(249,115,22,0.3)' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div className="expenses-total-banner">
+          <div className="total-banner-content">
             <div>
-              <span style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', color: 'var(--text-secondary)', letterSpacing: '0.5px' }}>
-                Total Expenses
-              </span>
-              <h2 style={{ fontSize: '1.6rem', fontWeight: 800, fontFamily: 'var(--font-display)', color: 'var(--danger)', margin: '4px 0 0 0' }}>
+              <span className="total-banner-label">Total Expenses</span>
+              <h2 className="total-banner-amount">
                 {formatCurrency(totalExpenseAmount, userCurrency)}
               </h2>
             </div>
-            <span style={{ fontSize: '0.75rem', fontWeight: 700, padding: '4px 10px', borderRadius: '12px', background: 'rgba(249,115,22,0.2)', color: 'var(--primary)' }}>
+            <span className="total-banner-count">
               {expenses.length} item{expenses.length !== 1 ? 's' : ''}
             </span>
           </div>

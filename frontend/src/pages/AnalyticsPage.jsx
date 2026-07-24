@@ -7,6 +7,8 @@ import { CHART_COLORS } from '../utils/constants';
 import PageHeader from '../components/layout/PageHeader';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, PieChart, Pie, Legend } from 'recharts';
 
+import { TrendingUp, ArrowUpRight, ArrowDownRight, Wallet, Lightbulb } from 'lucide-react';
+
 export default function AnalyticsPage() {
   const { user } = useAuth();
   const { addToast } = useToast();
@@ -56,12 +58,35 @@ export default function AnalyticsPage() {
       }))
     : [];
 
+  const totalInc = summary?.total_income || 0;
+  const totalExp = summary?.total_expense ?? summary?.total_expenses ?? 0;
+  const netSavings = summary?.balance ?? (totalInc - totalExp);
+
   return (
     <div className="mobile-page">
       <PageHeader title="Analytics" />
 
+      {/* Financial Overview Stats Cards */}
+      <div className="analytics-stats-grid stagger-1">
+        <div className="analytics-stat-card income">
+          <div className="icon-wrap"><ArrowUpRight size={16} /></div>
+          <span className="label">Total Inflow</span>
+          <span className="val">{formatCurrency(totalInc, userCurrency)}</span>
+        </div>
+        <div className="analytics-stat-card expense">
+          <div className="icon-wrap"><ArrowDownRight size={16} /></div>
+          <span className="label">Total Outflow</span>
+          <span className="val">{formatCurrency(totalExp, userCurrency)}</span>
+        </div>
+        <div className="analytics-stat-card savings">
+          <div className="icon-wrap"><Wallet size={16} /></div>
+          <span className="label">Net Savings</span>
+          <span className="val">{formatCurrency(netSavings, userCurrency)}</span>
+        </div>
+      </div>
+
       {/* Category Breakdown (Donut Chart) */}
-      <div className="dashboard-chart-card">
+      <div className="dashboard-chart-card stagger-2">
         <h3 className="section-title">Expense Distribution</h3>
         {pieData.length === 0 ? (
           <div className="chart-empty-state">No transaction history this month</div>

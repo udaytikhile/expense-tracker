@@ -73,13 +73,35 @@ export default function BudgetPage() {
 
       {/* Month Selector Filter */}
       <div className="budget-month-selector">
-        <label>Selected Month</label>
-        <input 
-          type="month" 
-          value={selectedMonth} 
-          onChange={e => setSelectedMonth(e.target.value)} 
-        />
+        <div className="month-selector-header">
+          <label>Budget Month</label>
+          <input 
+            type="month" 
+            value={selectedMonth} 
+            onChange={e => setSelectedMonth(e.target.value)} 
+          />
+        </div>
       </div>
+
+      {!loading && budgets.length > 0 && (() => {
+        const totalBudget = budgets.reduce((acc, b) => acc + (b.amount || 0), 0);
+        const totalSpent = budgets.reduce((acc, b) => acc + (b.spent || 0), 0);
+        const overallPercent = totalBudget > 0 ? Math.min(100, Math.round((totalSpent / totalBudget) * 100)) : 0;
+        return (
+          <div className="budget-summary-banner">
+            <div className="summary-banner-top">
+              <div>
+                <span className="summary-label">Total Monthly Budget</span>
+                <h3 className="summary-val">{formatCurrency(totalSpent, userCurrency)} / {formatCurrency(totalBudget, userCurrency)}</h3>
+              </div>
+              <span className="summary-badge">{overallPercent}% Used</span>
+            </div>
+            <div className="progress-track" style={{ marginTop: 10 }}>
+              <div className="progress-bar purple" style={{ width: `${overallPercent}%` }} />
+            </div>
+          </div>
+        );
+      })()}
 
       {/* Budgets List */}
       <div className="budget-goals-container">
