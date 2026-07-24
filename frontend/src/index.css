@@ -150,6 +150,36 @@ button:active {
   z-index: 100;
 }
 
+.offline-badge {
+  position: fixed;
+  top: calc(70px + var(--safe-area-top));
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: var(--danger);
+  color: white;
+  padding: 6px 14px;
+  border-radius: var(--rounded-full);
+  font-size: 0.75rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: var(--shadow-md);
+  z-index: 1000;
+  animation: slideDown 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes slideDown {
+  from {
+    transform: translate(-50%, -20px);
+    opacity: 0;
+  }
+  to {
+    transform: translate(-50%, 0);
+    opacity: 1;
+  }
+}
+
 .header-left {
   display: flex;
   align-items: center;

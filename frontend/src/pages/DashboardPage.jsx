@@ -28,11 +28,13 @@ export default function DashboardPage() {
         fetchSummary(),
         fetchExpenses()
       ]);
+      const inc = sumData?.total_income || 0;
+      const exp = sumData?.total_expense ?? sumData?.total_expenses ?? 0;
       setSummary({
-        total_income: sumData.total_income || 0,
-        total_expenses: sumData.total_expense || 0,
-        balance: (sumData.total_income || 0) - (sumData.total_expense || 0),
-        active_budgets_count: sumData.active_budgets_count || 0
+        total_income: inc,
+        total_expenses: exp,
+        balance: sumData?.balance ?? (inc - exp),
+        active_budgets_count: sumData?.active_budgets_count || 0
       });
       const safeExpData = Array.isArray(expData) ? expData : [];
       setRecentExpenses(safeExpData.slice(0, 5));

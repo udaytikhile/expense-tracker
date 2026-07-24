@@ -81,6 +81,8 @@ export default function ExpensesPage() {
   const currentItems = expenses.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(expenses.length / itemsPerPage);
 
+  const totalExpenseAmount = expenses.reduce((sum, exp) => sum + (Number(exp.amount) || 0), 0);
+
   return (
     <div className="mobile-page">
       <PageHeader 
@@ -107,6 +109,25 @@ export default function ExpensesPage() {
           <SlidersHorizontal size={18} />
         </button>
       </form>
+
+      {/* Total Expenses Summary Banner */}
+      {!loading && expenses.length > 0 && (
+        <div className="income-hero-card" style={{ marginBottom: 12, padding: '16px 20px', background: 'linear-gradient(135deg, rgba(249,115,22,0.15) 0%, rgba(234,88,12,0.05) 100%)', border: '1px solid rgba(249,115,22,0.3)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div>
+              <span style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', color: 'var(--text-secondary)', letterSpacing: '0.5px' }}>
+                Total Expenses
+              </span>
+              <h2 style={{ fontSize: '1.6rem', fontWeight: 800, fontFamily: 'var(--font-display)', color: 'var(--danger)', margin: '4px 0 0 0' }}>
+                {formatCurrency(totalExpenseAmount, userCurrency)}
+              </h2>
+            </div>
+            <span style={{ fontSize: '0.75rem', fontWeight: 700, padding: '4px 10px', borderRadius: '12px', background: 'rgba(249,115,22,0.2)', color: 'var(--primary)' }}>
+              {expenses.length} item{expenses.length !== 1 ? 's' : ''}
+            </span>
+          </div>
+        </div>
+      )}
 
       {/* Expenses List */}
       <div className="expenses-list-container">

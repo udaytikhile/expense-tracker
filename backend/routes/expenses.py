@@ -95,21 +95,52 @@ def get_summary():
     end = request.args.get('end')
 
     conn = sqlite3.connect(DB_PATH)
-    q = "SELECT category, SUM(amount) FROM expenses WHERE user_id=?"
+    
+    q_exp = "SELECT COALESCE(SUM(amount), 0) FROM expenses WHERE user_id=?"
+    q_inc = "SELECT COALESCE(SUM(amount), 0) FROM income WHERE user_id=?"
     params = [user_id]
     if start:
-        q += " AND date >= ?"
+        q_exp += " AND date >= ?"
+        q_inc += " AND date >= ?"
         params.append(start)
     if end:
-        q += " AND date <= ?"
+        q_exp += " AND date <= ?"
+        q_inc += " AND date <= ?"
         params.append(end)
-    q += " GROUP BY category ORDER BY SUM(amount) DESC"
 
-    rows = conn.execute(q, params).fetchall()
+    total_expense = conn.execute(q_exp, params).fetchone()[0] or 0
+    total_income = conn.execute(q_inc, params).fetchone()[0] or 0
+
+    q_cat = "SELECT category, SUM(amount) FROM expenses WHERE user_id=?"
+    params_cat = [user_id]
+    if start:
+        q_cat += " AND date >= ?"
+        params_cat.append(start)
+    if end:
+        q_cat += " AND date <= ?"
+        params_cat.append(end)
+    q_cat += " GROUP BY category ORDER BY SUM(amount) DESC"
+
+    rows = conn.execute(q_cat, params_cat).fetchall()
+    
+    category_distribution = {r[0]: r[1] for r in rows}
+    by_category = [{"category": r[0], "total": r[1]} for r in rows]
+
+    active_budgets_count = conn.execute(
+        "SELECT COUNT(*) FROM budgets WHERE user_id=?", (user_id,)
+    ).fetchone()[0] or 0
+
     conn.close()
 
-    summary = [{"category": r[0], "total": r[1]} for r in rows]
-    return jsonify(summary)
+    return jsonify({
+        "total_income": total_income,
+        "total_expense": total_expense,
+        "balance": total_income - total_expense,
+        "active_budgets_count": active_budgets_count,
+        "category_distribution": category_distribution,
+        "by_category": by_category
+    })
+
 
 @expenses_bp.route('/api/monthly', methods=['GET'])
 def get_monthly():
