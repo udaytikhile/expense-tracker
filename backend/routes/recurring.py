@@ -22,11 +22,37 @@ def get_recurring():
 @recurring_bp.route('/api/recurring', methods=['POST'])
 def add_recurring():
     data = request.json
+    if not data:
+        return jsonify({"error": "Missing request payload"}), 400
+
+    required = ['category', 'amount', 'next_date']
+    missing = [f for f in required if f not in data]
+    if missing:
+        return jsonify({"error": f"Missing required fields: {', '.join(missing)}"}), 400
+
+    try:
+        amount = float(data['amount'])
+        if amount <= 0:
+            return jsonify({"error": "Amount must be a positive number greater than 0"}), 400
+    except (ValueError, TypeError):
+        return jsonify({"error": "Amount must be a valid number"}), 400
+
+    next_date = data['next_date']
+    try:
+        from datetime import datetime
+        datetime.strptime(next_date, '%Y-%m-%d')
+    except (ValueError, TypeError):
+        return jsonify({"error": "next_date must be in YYYY-MM-DD format"}), 400
+
+    freq = data.get('frequency', 'monthly')
+    if freq not in ['daily', 'weekly', 'monthly']:
+        return jsonify({"error": "frequency must be daily, weekly, or monthly"}), 400
+
     user_id = data.get('user_id', 0)
     conn = sqlite3.connect(DB_PATH)
     conn.execute(
         "INSERT INTO recurring_expenses (user_id, category, amount, note, frequency, next_date) VALUES (?, ?, ?, ?, ?, ?)",
-        (user_id, data['category'], data['amount'], data.get('note', ''), data.get('frequency', 'monthly'), data['next_date'])
+        (user_id, data['category'], amount, data.get('note', ''), freq, next_date)
     )
     conn.commit()
     conn.close()

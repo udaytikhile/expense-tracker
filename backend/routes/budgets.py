@@ -34,9 +34,31 @@ def get_budgets():
 @budgets_bp.route('/api/budgets', methods=['POST'])
 def save_budget():
     data = request.json
-    user_id = data.get('user_id', 0)
+    if not data:
+        return jsonify({"error": "Missing request payload"}), 400
+
+    if 'category' not in data:
+        return jsonify({"error": "Missing required field: category"}), 400
+
     month = data.get('month', date.today().strftime('%Y-%m'))
-    limit_val = data.get('limit_amount') if data.get('limit_amount') is not None else data.get('amount', 0)
+    try:
+        from datetime import datetime
+        datetime.strptime(month, '%Y-%m')
+    except (ValueError, TypeError):
+        return jsonify({"error": "Month must be in YYYY-MM format"}), 400
+
+    raw_limit = data.get('limit_amount') if data.get('limit_amount') is not None else data.get('amount')
+    if raw_limit is None:
+        return jsonify({"error": "Missing required field: limit_amount or amount"}), 400
+
+    try:
+        limit_val = float(raw_limit)
+        if limit_val < 0:
+            return jsonify({"error": "Limit amount must be non-negative"}), 400
+    except (ValueError, TypeError):
+        return jsonify({"error": "Limit amount must be a valid number"}), 400
+
+    user_id = data.get('user_id', 0)
     conn = sqlite3.connect(DB_PATH)
     conn.execute(
         "INSERT OR REPLACE INTO budgets (user_id, category, limit_amount, month) VALUES (?, ?, ?, ?)",

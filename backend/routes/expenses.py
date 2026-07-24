@@ -39,14 +39,36 @@ def get_expenses():
 @expenses_bp.route('/api/expenses', methods=['POST'])
 def add_expense():
     data = request.json
+    if not data:
+        return jsonify({"error": "Missing request payload"}), 400
+
+    required = ['date', 'category', 'amount']
+    missing = [f for f in required if f not in data]
+    if missing:
+        return jsonify({"error": f"Missing required fields: {', '.join(missing)}"}), 400
+
+    try:
+        amount = float(data['amount'])
+        if amount <= 0:
+            return jsonify({"error": "Amount must be a positive number greater than 0"}), 400
+    except (ValueError, TypeError):
+        return jsonify({"error": "Amount must be a valid number"}), 400
+
+    date_val = data['date']
+    try:
+        from datetime import datetime
+        datetime.strptime(date_val, '%Y-%m-%d')
+    except (ValueError, TypeError):
+        return jsonify({"error": "Date must be in YYYY-MM-DD format"}), 400
+
     user_id = data.get('user_id', 0)
     conn = sqlite3.connect(DB_PATH)
     conn.execute("INSERT INTO expenses (user_id, date, category, amount, note) VALUES (?, ?, ?, ?, ?)",
-                 (user_id, data['date'], data['category'], data['amount'], data.get('note', '')))
+                 (user_id, date_val, data['category'], amount, data.get('note', '')))
     conn.commit()
 
     # Check budgets and create notifications
-    month = data['date'][:7]
+    month = date_val[:7]
     budgets = conn.execute(
         "SELECT category, limit_amount FROM budgets WHERE user_id=? AND month=?",
         (user_id, month)
@@ -71,10 +93,32 @@ def add_expense():
 @expenses_bp.route('/api/expenses/<int:id>', methods=['PUT'])
 def update_expense(id):
     data = request.json
+    if not data:
+        return jsonify({"error": "Missing request payload"}), 400
+
+    required = ['date', 'category', 'amount']
+    missing = [f for f in required if f not in data]
+    if missing:
+        return jsonify({"error": f"Missing required fields: {', '.join(missing)}"}), 400
+
+    try:
+        amount = float(data['amount'])
+        if amount <= 0:
+            return jsonify({"error": "Amount must be a positive number greater than 0"}), 400
+    except (ValueError, TypeError):
+        return jsonify({"error": "Amount must be a valid number"}), 400
+
+    date_val = data['date']
+    try:
+        from datetime import datetime
+        datetime.strptime(date_val, '%Y-%m-%d')
+    except (ValueError, TypeError):
+        return jsonify({"error": "Date must be in YYYY-MM-DD format"}), 400
+
     user_id = data.get('user_id', 0)
     conn = sqlite3.connect(DB_PATH)
     conn.execute("UPDATE expenses SET date=?, category=?, amount=?, note=? WHERE id=? AND user_id=?",
-                 (data['date'], data['category'], data['amount'], data.get('note', ''), id, user_id))
+                 (date_val, data['category'], amount, data.get('note', ''), id, user_id))
     conn.commit()
     conn.close()
     return jsonify({"message": "Expense updated successfully"})

@@ -11,7 +11,7 @@ export default function LoginPage() {
 
   const [isSignUp, setIsSignUp] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  
+
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -67,13 +67,13 @@ export default function LoginPage() {
 
       <div className="login-card-container">
         <div className="login-tabs">
-          <button 
+          <button
             className={`login-tab-btn ${!isSignUp ? 'active' : ''}`}
             onClick={() => { setIsSignUp(false); }}
           >
             Sign In
           </button>
-          <button 
+          <button
             className={`login-tab-btn ${isSignUp ? 'active' : ''}`}
             onClick={() => { setIsSignUp(true); }}
           >
@@ -127,8 +127,8 @@ export default function LoginPage() {
             </button>
           </div>
 
-          <button 
-            type="submit" 
+          <button
+            type="submit"
             className="login-submit-btn"
             disabled={loading}
           >
